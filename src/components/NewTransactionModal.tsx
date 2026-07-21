@@ -35,10 +35,19 @@ const Content = styled.div`
   position: relative;
   color: #e1e1e6;
 
+  @media (max-width: 480px) {
+    padding: 1.5rem;
+  }
+
   h2 {
     color: #e1e1e6;
     font-size: 1.5rem;
     margin-bottom: 2rem;
+
+    @media (max-width: 480px) {
+      font-size: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
   }
 `;
 

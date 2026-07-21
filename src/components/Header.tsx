@@ -32,12 +32,16 @@ const Content = styled.div`
     span {
       color: #e1e1e6;
     }
+
+    @media (max-width: 480px) {
+      font-size: 1.25rem;
+    }
   }
 
   .actions {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
   }
 `;
 
@@ -46,12 +50,18 @@ const NewTransactionButton = styled.button`
   color: #fff;
   background: #00875f;
   border: 0;
-  padding: 0 1.25rem;
+  padding: 0 1rem;
   border-radius: 6px;
-  height: 48px;
+  height: 42px;
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.2s;
+
+  @media (max-width: 480px) {
+    font-size: 0.875rem;
+    padding: 0 0.75rem;
+    height: 38px;
+  }
 
   &:hover {
     background: #00b37e;
@@ -62,14 +72,19 @@ const SignOutButton = styled.button`
   background: #202024;
   border: 1px solid #29292e;
   color: #c4c4cc;
-  height: 48px;
-  width: 48px;
+  height: 42px;
+  width: 42px;
   border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: border-color 0.2s, color 0.2s;
+
+  @media (max-width: 480px) {
+    height: 38px;
+    width: 38px;
+  }
 
   &:hover {
     border-color: #f75a68;
@@ -96,7 +111,7 @@ export function Header({ onOpenNewTransactionModal }: HeaderProps) {
           </NewTransactionButton>
 
           <SignOutButton type="button" onClick={handleSignOut} title="Sair da conta">
-            <LogOut size={20} />
+            <LogOut size={18} />
           </SignOutButton>
         </div>
       </Content>

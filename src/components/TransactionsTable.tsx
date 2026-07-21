@@ -1,131 +1,128 @@
 import styled from 'styled-components';
-import { Trash2 } from 'lucide-react';
 import type { Transaction } from '../types/transaction';
+import { Trash2 } from 'lucide-react';
+
+interface TransactionsTableProps {
+  transactions: Transaction[];
+  onDeleteTransaction?: (id: string) => void;
+}
 
 const Container = styled.div`
-  max-width: 1120px;
-  margin: 4rem auto 2rem;
-  padding: 0 1rem;
+  margin-top: 4rem;
+  width: 100%;
+  overflow-x: auto; /* Permite rolar a tabela lateralmente no celular */
 
   table {
     width: 100%;
-    border-spacing: 0 0.5rem;
+    border-collapse: collapse;
+    min-width: 600px; /* Garante espaço mínimo para os dados */
 
     th {
-      color: #a0aec0;
-      font-weight: 500;
+      color: #c4c4cc;
+      font-weight: normal;
       padding: 1rem 2rem;
       text-align: left;
       line-height: 1.5rem;
     }
 
     td {
-      padding: 1.25rem 2rem;
-      border: 0;
-      background: #ffffff;
-      color: #4a5568;
-      font-weight: 400;
+      padding: 1rem 2rem;
+      background: #202024;
+      border-top: 4px solid #121214;
+      color: #c4c4cc;
 
       &:first-child {
-        border-radius: 0.5rem 0 0 0.5rem;
-        color: #2d3748;
-        font-weight: 600;
+        border-top-left-radius: 6px;
+        border-bottom-left-radius: 6px;
+        color: #e1e1e6;
+        font-weight: 500;
       }
 
       &:last-child {
-        border-radius: 0 0.5rem 0.5rem 0;
-      }
-
-      &.receita {
-        color: #38a169;
-        font-weight: 600;
-      }
-
-      &.despesa {
-        color: #e53e3e;
-        font-weight: 600;
+        border-top-right-radius: 6px;
+        border-bottom-right-radius: 6px;
+        text-align: center;
       }
     }
-  }
-
-  .delete-button {
-    background: transparent;
-    border: 0;
-    color: #e53e3e;
-    cursor: pointer;
-    transition: opacity 0.2s;
-
-    &:hover {
-      opacity: 0.7;
-    }
-  }
-
-  .empty-state {
-    text-align: center;
-    padding: 3rem;
-    background: #ffffff;
-    border-radius: 0.5rem;
-    color: #a0aec0;
   }
 `;
 
-interface TransactionsTableProps {
-  transactions: Transaction[];
-  onDeleteTransaction: (id: string) => void;
-}
+const PriceHighlight = styled.span<{ $tipo: 'receita' | 'despesa' }>`
+  color: ${(props) => (props.$tipo === 'receita' ? '#00b37e' : '#f75a68')};
+  font-weight: 500;
+`;
 
-export function TransactionsTable({
-  transactions,
-  onDeleteTransaction,
-}: TransactionsTableProps) {
+const DeleteButton = styled.button`
+  background: transparent;
+  border: 0;
+  color: #7c7c8a;
+  cursor: pointer;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+
+  &:hover {
+    color: #f75a68;
+  }
+`;
+
+export function TransactionsTable({ transactions, onDeleteTransaction }: TransactionsTableProps) {
   const formatCurrency = (val: number) =>
-    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
+    new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(val);
 
-  const formatDate = (dateString: string) =>
-    new Intl.DateTimeFormat('pt-BR').format(new Date(dateString));
+  const formatDate = (dateStr: string) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    return new Intl.DateTimeFormat('pt-BR').format(date);
+  };
 
   return (
     <Container>
-      {transactions.length === 0 ? (
-        <div className="empty-state">
-          Nenhuma transação cadastrada ainda. Clique em "Nova Transação" para começar! 🚀
-        </div>
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Título</th>
-              <th>Valor</th>
-              <th>Categoria</th>
-              <th>Data</th>
-              <th>Ação</th>
-            </tr>
-          </thead>
-          <tbody>
-            {transactions.map((t) => (
-              <tr key={t.id}>
-                <td>{t.descricao}</td>
-                <td className={t.tipo}>
-                  {t.tipo === 'despesa' && '- '}
-                  {formatCurrency(t.valor)}
-                </td>
-                <td>{t.categoria}</td>
-                <td>{formatDate(t.data)}</td>
+      <table>
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Preço</th>
+            <th>Categoria</th>
+            <th>Data</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {transactions.map((transaction) => {
+            const valorNumerico = Number(transaction.valor) || 0;
+            return (
+              <tr key={transaction.id}>
+                <td>{transaction.descricao}</td>
                 <td>
-                  <button
-                    type="button"
-                    className="delete-button"
-                    onClick={() => onDeleteTransaction(t.id)}
-                    title="Excluir transação"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+                  <PriceHighlight $tipo={transaction.tipo}>
+                    {transaction.tipo === 'despesa' && '- '}
+                    {formatCurrency(valorNumerico)}
+                  </PriceHighlight>
+                </td>
+                <td>{transaction.categoria}</td>
+                <td>{formatDate(transaction.data)}</td>
+                <td>
+                  {onDeleteTransaction && (
+                    <DeleteButton
+                      title="Excluir transação"
+                      onClick={() => onDeleteTransaction(transaction.id)}
+                    >
+                      <Trash2 size={18} />
+                    </DeleteButton>
+                  )}
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+            );
+          })}
+        </tbody>
+      </table>
     </Container>
   );
 }
